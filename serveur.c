@@ -16,10 +16,20 @@ int main(int argc, char *argv[])
     client c;
     client* ptr;
     int port;
+    int fd_error;
     if(argc <2 || argc > 3){
         printf("Usage: %s port,[file]\n", argv[0]);
         exit(1);
     }
+    if(argc == 3){
+        if((fd_error = open(argv[1], O_CREAT|O_WRONLY, 0700))==-1){
+			perror("Problem lors de l'ouverture du fichier");
+			exit(1);
+		}
+    } else {
+        fd_error = dup(stderr);
+    }
+    write(fd_error, "BLABLA", sizeof("BLABLA"));
     port = atoi(argv[1]);
     if((ptr = tabClient.clients = (client*)malloc(JOUEURS_MAX*sizeof(client)))==NULL){
         perror("problem malloc?");
