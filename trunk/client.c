@@ -8,7 +8,12 @@ int main(int argc, char *argv[])
     client c;
     SOCKET sock;
     SOCKADDR_IN sin;
-    
+    int port;
+    if(argc <2 || argc > 3){
+        printf("Usage: %s port,[file]\n", argv[0]);
+        exit(1);
+    }
+    port = atoi(argv[1]);
     if(!erreur)
     {
         printf("Veuillez entrez votre pseudo de jeu\n");
@@ -22,7 +27,7 @@ int main(int argc, char *argv[])
         /* Configuration de la connexion */
         sin.sin_addr.s_addr = inet_addr("127.0.0.1");
         sin.sin_family = AF_INET;
-        sin.sin_port = htons(PORT);
+        sin.sin_port = htons(port);
         
         /* Si le client arrive à se connecter */
         if(connect(sock, (SOCKADDR*)&sin, sizeof(sin)) != SOCKET_ERROR){

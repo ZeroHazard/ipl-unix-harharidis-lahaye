@@ -15,6 +15,12 @@ int main(int argc, char *argv[])
     tabClient tabClient;
     client c;
     client* ptr;
+    int port;
+    if(argc <2 || argc > 3){
+        printf("Usage: %s port,[file]\n", argv[0]);
+        exit(1);
+    }
+    port = atoi(argv[1]);
     if((ptr = tabClient.clients = (client*)malloc(JOUEURS_MAX*sizeof(client)))==NULL){
         perror("problem malloc?");
         exit(1);
@@ -46,7 +52,7 @@ int main(int argc, char *argv[])
             /* Configuration */
             sin.sin_addr.s_addr = htonl(INADDR_ANY);  /* Adresse IP automatique */
             sin.sin_family = AF_INET;                 /* Protocole familial (IP) */
-            sin.sin_port = htons(PORT);               /* Listage du port */
+            sin.sin_port = htons(port);               /* Listage du port */
             sock_err = bind(sock, (SOCKADDR*)&sin, recsize);
             
             /* Si la socket fonctionne */
@@ -60,7 +66,7 @@ int main(int argc, char *argv[])
                 if(sock_err != SOCKET_ERROR)
                 {
                     /* Attente pendant laquelle le client se connecte */
-                    printf("Patientez pendant que le client se connecte sur le port %d...\n", PORT);
+                    printf("Patientez pendant que le client se connecte sur le port %d...\n", port);
                     struct sigaction sa;
                     sa.sa_handler = handler;
                     sigemptyset(&sa.sa_mask);
