@@ -8,7 +8,7 @@ typedef struct tabClient{
 }tabClient;
 void handler(int);
 int boolean = 1;
-int main(void)
+int main(int argc, char *argv[])
 {
     int erreur = 0;
     int i;

@@ -1,6 +1,6 @@
 #include "header.h"
 
-int main(void)
+int main(int argc, char *argv[])
 {
     int erreur = 0;
     char ligne[tailleLigne];
