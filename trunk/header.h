@@ -14,9 +14,12 @@ typedef int SOCKET;
 typedef struct sockaddr_in SOCKADDR_IN;
 typedef struct sockaddr SOCKADDR;
 #define tailleLigne 1024
+//#define SYS(call, fd_erreur, message) ((call)<0)? (erreur(fd_erreur, message)):0
 
 #include <stdio.h>
 #include <stdlib.h>
+
+void afficher_erreur(int, char*);
 
 typedef struct client{
     char pseudo[50];
