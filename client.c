@@ -36,7 +36,7 @@ int main(void)
         
         /* On ferme la socket précédemment ouverte */
         close(sock);
-        printf("Fermeture du client terminéEEEEEEEEEE\n");
+        printf("Fermeture du client terminée\n");
         return EXIT_SUCCESS;
     }
 }
