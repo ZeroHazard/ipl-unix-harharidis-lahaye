@@ -16,7 +16,6 @@ typedef struct sockaddr SOCKADDR;
 
 #include <stdio.h>
 #include <stdlib.h>
-#define PORT 50000
 
 typedef struct client{
     char pseudo[50];
