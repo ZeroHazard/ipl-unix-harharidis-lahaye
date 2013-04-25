@@ -13,5 +13,5 @@ int initMemoire(int fd_erreur){
     if ((shm = shmat(shmid, NULL, 0)) == (char *) -1){
         afficher_erreur(fd_erreur, "memoire-shmat");
     }
-    return 0;
+    return shmid;
 }
