@@ -1,0 +1,21 @@
+/*
+ * partie.h
+ *
+ *  Created on: Apr 25, 2013
+ *      Author: afro
+ */
+
+#ifndef PARTIE_H_
+#define PARTIE_H_
+#define JOUEURS_MAX 5
+
+
+#include "joueurs.h"
+#include "header.h"
+
+typedef struct partie {
+    int nombreJoueur; //le nombre de joueur actif
+    joueurs* joueurs[JOUEURS_MAX];
+}partie;
+
+#endif /* PARTIE_H_ */
