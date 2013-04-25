@@ -7,7 +7,7 @@
 
 #ifndef JOUEURS_H_
 #define JOUEURS_H_
-
+#include "header.h"
 typedef struct joueurs{
     char pseudo[50];
     int score;

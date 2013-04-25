@@ -12,3 +12,10 @@ util.o : util.c util.h
 	$(CC) -c  util.c
 memoire.o : memoire.c memoire.h util.h
 	$(CC) -c memoire.c
+joueurs.o : joueurs.c joueurs.h	header.h
+	$(CC) -c joueurs.c
+partie.o : partie.c partie.h joueurs.h
+	$(CC) -c partie.c	
+message.o : message.c message.h partie.h
+	$(CC) -c message.c
+	
