@@ -11,4 +11,4 @@ serveur.o : serveur.c header.h util.h memoire.h
 util.o : util.c util.h   
 	$(CC) -c  util.c
 memoire.o : memoire.c memoire.h util.h
-	$(CC) -c memoire.c util.o
+	$(CC) -c memoire.c
