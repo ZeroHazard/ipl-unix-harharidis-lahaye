@@ -1,4 +1,6 @@
 #include "header.h"
+#include "memoire.h"
+#include "util.h"
 
 int main(int argc, char *argv[])
 {
@@ -8,17 +10,26 @@ int main(int argc, char *argv[])
     client c;
     SOCKET sock;
     SOCKADDR_IN sin;
+    int fd_error;
     int port;
     if(argc <2 || argc > 3){
         printf("Usage: %s port,[file]\n", argv[0]);
         exit(1);
+    }
+    if(argc == 3){
+        if((fd_error = open(argv[2], O_CREAT|O_WRONLY, 0700))==-1){
+            afficher_erreur(fd_error,"serveur-erreur lors de l'ouverture du fichier\n");
+            exit(1);
+        }
+    } else {
+        fd_error = dup(2);
     }
     port = atoi(argv[1]);
     if(!erreur)
     {
         printf("Veuillez entrez votre pseudo de jeu\n");
         if(fgets(ligne, tailleLigne, stdin)==NULL){
-            perror("problem fgets?\n");
+            afficher_erreur(fd_error,"serveur-fgets\n");
             exit(1);
         }
         /* Création de la socket */
@@ -45,3 +56,4 @@ int main(int argc, char *argv[])
         return EXIT_SUCCESS;
     }
 }
+

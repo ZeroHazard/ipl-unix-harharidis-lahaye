@@ -1,4 +1,6 @@
 #include "header.h"
+#include "memoire.h"
+#include "util.h"
 #include <signal.h>
 #define JOUEURS_MAX 5
 #define TEMPS 30
@@ -23,15 +25,15 @@ int main(int argc, char *argv[])
     }
     if(argc == 3){
         if((fd_error = open(argv[2], O_CREAT|O_WRONLY, 0700))==-1){
-			perror("Problem lors de l'ouverture du fichier");
-			exit(1);
-		}
+            afficher_erreur(fd_error,"serveur-erreur lors de l'ouverture du fichier\n");
+            exit(1);
+        }
     } else {
         fd_error = dup(2);
     }
     port = atoi(argv[1]);
     if((ptr = tabClient.clients = (client*)malloc(JOUEURS_MAX*sizeof(client)))==NULL){
-        perror("problem malloc?");
+        afficher_erreur(fd_error,"serveur-malloc\n");
         exit(1);
     }
     tabClient.tailleLogique = 0;
@@ -93,7 +95,7 @@ int main(int argc, char *argv[])
                         }
                         printf("Un client se connecte avec la socket %d de %s:%d\n", csock, inet_ntoa(csin.sin_addr), htons(csin.sin_port));
                         if(recv(csock, &c, sizeof(c), 0)<0){
-                            afficher_erreur(fd_error,"serveur-recv");
+                            afficher_erreur(fd_error,"serveur-recv\n");
                         }
                         ptr = tabClient.clients+tabClient.tailleLogique;
                         strcpy(ptr->pseudo,c.pseudo);
@@ -105,7 +107,7 @@ int main(int argc, char *argv[])
                     for (i=0; i<tabClient.tailleLogique; i++) {
                         char ligne[1024]= "";
                         if((recv((tabClient.clients+i)->csocket, ligne, sizeof(ligne), MSG_DONTWAIT))==0){
-                            printf("Deconnexion du joueur: %s", (tabClient.clients+i)->pseudo);
+                            printf("Deconnexion du joueur: %s\n", (tabClient.clients+i)->pseudo);
                             if(i==tabClient.tailleLogique){
                                 ptr--;
                             }else{
@@ -124,10 +126,10 @@ int main(int argc, char *argv[])
                     }
                 }
                 else
-                    perror("listen");
+                    afficher_erreur(fd_error,"serveur-listen\n");
             }
             else
-                perror("bind");
+               afficher_erreur(fd_error,"serveur-bind\n");
             
             /* Fermeture de la socket client et de la socket serveur */
             close(csock);
@@ -135,7 +137,7 @@ int main(int argc, char *argv[])
             printf("Fermeture du serveur terminée\n");
         }
         else
-            perror("socket");
+            afficher_erreur(fd_error,"serveur-socket\n");
         
     }
     
@@ -144,6 +146,5 @@ int main(int argc, char *argv[])
 
 
 void handler(int null){
-	boolean = 0;
-    //BLABLA
+    boolean = 0;
 }

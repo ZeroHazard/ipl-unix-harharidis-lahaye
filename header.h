@@ -19,8 +19,6 @@ typedef struct sockaddr SOCKADDR;
 #include <stdio.h>
 #include <stdlib.h>
 
-void afficher_erreur(int, char*);
-
 typedef struct client{
     char pseudo[50];
     SOCKET csocket;
