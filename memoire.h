@@ -6,7 +6,7 @@
 #include <sys/sem.h>
 #define MEMOIRE 19
 
-#include <partie.h>
+#include "partie.h""
 
 int initMemoire();
 #endif
