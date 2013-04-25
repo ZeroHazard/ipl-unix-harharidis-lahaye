@@ -6,11 +6,11 @@
 #include <sys/sem.h>
 #define MEMOIRE 19
 
-#include "partie.h""
+#include "partie.h"
 
 int initMemoire();
 #endif
 
-partie* lectureMemoire(int qid);
-void ecritureMemoire(int, partie *);
+partie* lectureMemoire(int qid, int);
+void ecritureMemoire(int, partie *, int);
 void removeMemoire(int, int);
