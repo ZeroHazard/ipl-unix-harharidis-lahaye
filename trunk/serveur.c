@@ -139,7 +139,8 @@ int main(int argc, char *argv[])
                 afficher_erreur(fd_error,"serveur-bind\n");
             
             /* Fermeture de la socket client et de la socket serveur */
-            fermerMemoire(fd_error);
+            //fermerMemoire(fd_error);
+
             close(csock);
             close(sock);
             printf("Fermeture du serveur terminée\n");
