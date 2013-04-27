@@ -127,6 +127,7 @@ int main(int argc, char *argv[])
                         printf("La partie commence!\n");
                         for(i = 0;i<tabClient.tailleLogique;i++){
                             send((tabClient.clients+i)->csocket, "BLABLA", sizeof("BLABLA"), 0);
+                            sleep(1);
                         }
                     } else {
                         printf("Il n'y a pas assez de joueur pour commencer la partie\n");
@@ -139,8 +140,7 @@ int main(int argc, char *argv[])
                 afficher_erreur(fd_error,"serveur-bind\n");
             
             /* Fermeture de la socket client et de la socket serveur */
-            //fermerMemoire(fd_error);
-
+            fermerMemoire(fd_error);
             close(csock);
             close(sock);
             printf("Fermeture du serveur terminée\n");
