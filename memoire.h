@@ -7,10 +7,12 @@
 #define MEMOIRE 19
 
 #include "partie.h"
-
-int initMemoire();
+#include "util.h"
+#include "joueur.h"
+void initMemoire();
 #endif
 
-partie* lectureMemoire(int qid, int);
-void ecritureMemoire(int, partie *, int);
+partie* lectureMemoire(int);
+void ecritureMemoire(int, client*);
 void removeMemoire(int, int);
+void fermerMemoire(int);

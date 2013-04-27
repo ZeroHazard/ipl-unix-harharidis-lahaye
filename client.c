@@ -42,15 +42,18 @@ int main(int argc, char *argv[])
         
         /* Si le client arrive à se connecter */
         if(connect(sock, (SOCKADDR*)&sin, sizeof(sin)) != SOCKET_ERROR){
+            initMemoire(fd_error,0);
             strcpy(c.pseudo,ligne);
             c.csocket = sock;
             send(sock, &c, sizeof(c), 0);
             recv(sock, recu, sizeof(recu), 0);
+            lectureMemoire(fd_error);
         }
         else
             printf("Impossible de se connecter\n");
         
         /* On ferme la socket précédemment ouverte */
+        fermerMemoire(fd_error);
         close(sock);
         printf("Fermeture du client terminée\n");
         return EXIT_SUCCESS;

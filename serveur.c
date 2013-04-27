@@ -2,6 +2,7 @@
 #include "memoire.h"
 #include "util.h"
 #include <signal.h>
+#include "partie.h"
 #define JOUEURS_MAX 5
 #define TEMPS 30
 typedef struct tabClient{
@@ -19,6 +20,7 @@ int main(int argc, char *argv[])
     client* ptr;
     int port;
     int fd_error;
+    partie* part = NULL;
     if(argc <2 || argc > 3){
         printf("Usage: %s port,[file]\n", argv[0]);
         exit(1);
@@ -83,6 +85,7 @@ int main(int argc, char *argv[])
                     sigemptyset(&sa.sa_mask);
                     sa.sa_flags = 0;
                     sigaction(SIGALRM,&sa,NULL);
+                    initMemoire(fd_error,1);
                     while(boolean == 1){
                         //Si c'est le premier inscrit on lance l'alarm
                         // La condition du while est un boolean qu'on mettra a fals dans la methode handler
@@ -100,6 +103,7 @@ int main(int argc, char *argv[])
                         ptr = tabClient.clients+tabClient.tailleLogique;
                         strcpy(ptr->pseudo,c.pseudo);
                         ptr->csocket = csock;
+                        ecritureMemoire(fd_error, ptr);
                         printf("Vous avez bien été inscrit %s\n", ptr->pseudo);
                         tabClient.tailleLogique++;
                     }
@@ -121,6 +125,9 @@ int main(int argc, char *argv[])
                     }
                     if(tabClient.tailleLogique >= 2){
                         printf("La partie commence!\n");
+                        for(i = 0;i<tabClient.tailleLogique;i++){
+                            send((tabClient.clients+i)->csocket, "BLABLA", sizeof("BLABLA"), 0);
+                        }
                     } else {
                         printf("Il n'y a pas assez de joueur pour commencer la partie\n");
                     }
@@ -129,9 +136,10 @@ int main(int argc, char *argv[])
                     afficher_erreur(fd_error,"serveur-listen\n");
             }
             else
-               afficher_erreur(fd_error,"serveur-bind\n");
+                afficher_erreur(fd_error,"serveur-bind\n");
             
             /* Fermeture de la socket client et de la socket serveur */
+            fermerMemoire(fd_error);
             close(csock);
             close(sock);
             printf("Fermeture du serveur terminée\n");

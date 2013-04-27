@@ -10,12 +10,15 @@
 #define JOUEURS_MAX 5
 
 
-#include "joueurs.h"
+#include "joueur.h"
 #include "header.h"
 
 typedef struct partie {
     int nombreJoueur; //le nombre de joueur actif
-    joueurs* joueurs[JOUEURS_MAX];
+    joueurs joueurs[JOUEURS_MAX];
 }partie;
+
+partie* initPartie(partie*);
+
 
 #endif /* PARTIE_H_ */
