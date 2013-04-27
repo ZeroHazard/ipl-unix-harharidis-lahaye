@@ -22,7 +22,6 @@ int down(int sem_id)
 	sem_op.sem_num=0;
 	sem_op.sem_op=-1;
 	sem_op.sem_flg=0;
-
 	if(semop(sem_id, &sem_op, 1) == -1) {
 		printf("Erreur lors du down \n");
 		return -1;
@@ -36,7 +35,7 @@ int up(int sem_id)
 	sem_op.sem_num=0;
 	sem_op.sem_op=+1;
 	sem_op.sem_flg=0;
-
+    
 	if(semop(sem_id, &sem_op,1) == -1) {
 		printf("Erreur lors du up\n");
 		return -1;
@@ -45,7 +44,7 @@ int up(int sem_id)
 }
 
 void initMemoire(int fd_erreur, int serveur){
-//    part = initPartie(part);
+    //    part = initPartie(part);
     key = ftok("./", 50000);
     keyMutex = ftok("./", 50001);
     keyBD = ftok("./", 50002);
@@ -72,27 +71,28 @@ void initMemoire(int fd_erreur, int serveur){
 
 //écrit dans la mémoire
 void ecritureMemoire(int fd_erreur, client* cl){
-		joueurs* j;
-		j = initJoueurs(cl->pseudo, fd_erreur);
-		down(bd);
-		part->nombreJoueur = part->nombreJoueur+1;
-		part->joueurs[part->nombreJoueur-1] = *j;
-		up(bd);
+    joueurs* j;
+    j = initJoueurs(cl->pseudo, fd_erreur);
+    down(bd);
+    part->nombreJoueur = part->nombreJoueur+1;
+    part->joueurs[part->nombreJoueur-1] = *j;
+    up(bd);
 }
 
 partie* lectureMemoire(int fd_error){
-		down(mutex);
-		rc = rc + 1;
-		if(rc == 1) down(bd);
-		up(mutex);
-		printf("Le nombre de joueur est :%d\n",part->nombreJoueur);
-		printf("Le pseudo du joueur est :%s\n",(part->joueurs)[0].pseudo);
-		printf("Le pseudo du joueur est :%s\n",(part->joueurs)[1].pseudo);
-		down(mutex);
-		rc = rc - 1;
-		if(rc == 0) up(&bd);
-		up(mutex);
-		return part;
+    down(mutex);
+    rc = rc + 1;
+    if(rc == 1) down(bd);
+    up(mutex);
+    printf("Le nombre de joueur est :%d\n",part->nombreJoueur);
+    printf("Le pseudo du joueur est :%s\n",(part->joueurs)[0].pseudo);
+    printf("Le pseudo du joueur est :%s\n",(part->joueurs)[1].pseudo);
+    printf("Le pseudo du joueur est :%s\n",(part->joueurs)[2].pseudo);
+    down(mutex);
+    rc = rc - 1;
+    if(rc == 0) up(bd);
+    up(mutex);
+    return part;
 }
 
 void fermerMemoire(int fd_error){
@@ -101,5 +101,11 @@ void fermerMemoire(int fd_error){
     }
     if((shmctl(shmid, IPC_RMID, NULL))<0){
         afficher_erreur(fd_error, "memoire-shmctl");
+    }
+    if((semctl(mutex, IPC_RMID, 0))<0){
+        afficher_erreur(fd_error, "memoire_semctl");
+    }
+    if((semctl(bd, IPC_RMID, 0))<0){
+        afficher_erreur(fd_error, "memoire_semctl");
     }
 }
