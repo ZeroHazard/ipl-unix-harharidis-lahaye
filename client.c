@@ -53,7 +53,6 @@ int main(int argc, char *argv[])
             printf("Impossible de se connecter\n");
         
         /* On ferme la socket précédemment ouverte */
-//        fermerMemoire(fd_error);
         close(sock);
         printf("Fermeture du client terminée\n");
         return EXIT_SUCCESS;

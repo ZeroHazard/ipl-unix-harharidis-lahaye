@@ -4,17 +4,19 @@
  */
 
 #include "memoire.h"
-
+typedef int semaphore;
 
 int mem;
 key_t key;
 key_t keyBD;
 key_t keyMutex;
+key_t keyClient;
 int shmid;
+int shmidClient;
 partie* part;
-int mutex;
-int bd;
-int rc;
+semaphore mutex;
+semaphore bd;
+int* rc;
 
 int down(int sem_id)
 {
@@ -48,7 +50,8 @@ void initMemoire(int fd_erreur, int serveur){
     key = ftok("./", 50000);
     keyMutex = ftok("./", 50001);
     keyBD = ftok("./", 50002);
-    if(serveur == 1){
+    keyClient = ftok("./", 50003);
+    if(serveur == 1){ // le serveur
         if((shmid = shmget(key, sizeof(part), IPC_CREAT | 0666))<0){
             afficher_erreur(fd_erreur, "memoire-shmget\n");
         }
@@ -56,12 +59,19 @@ void initMemoire(int fd_erreur, int serveur){
         bd = semget(keyBD, 1,  IPC_CREAT | 0660);
         semctl(mutex, 0, SETVAL, 1);
         semctl(bd, 0, SETVAL, 1);
-    }else{
+    }else{ // le client
         if((shmid = shmget(key, sizeof(part), 0))<0){
             afficher_erreur(fd_erreur, "memoire-shmget\n");
         }
         mutex = semget(keyMutex, 1, 0);
         bd = semget(keyBD, 1, 0);
+    }
+    if((shmidClient = shmget(keyClient, sizeof(int), IPC_CREAT | 0666))<0){
+        afficher_erreur(fd_erreur, "memoire-shmget\n");
+    }
+    rc = (int*)shmat(shmid, NULL, 0);
+    if (*rc < 0) {
+        afficher_erreur(fd_erreur, "memoire-shmat\n");
     }
     part = shmat(shmid, NULL, 0);
     if ((int) part < 0) {
@@ -69,28 +79,29 @@ void initMemoire(int fd_erreur, int serveur){
     }
 }
 
-//écrit dans la mémoire
+
 void ecritureMemoire(int fd_erreur, client* cl){
     joueurs* j;
     j = initJoueurs(cl->pseudo, fd_erreur);
     down(bd);
     part->nombreJoueur = part->nombreJoueur+1;
     part->joueurs[part->nombreJoueur-1] = *j;
+    printf("Le nombre de joueur est :%d\n",part->nombreJoueur);
     up(bd);
 }
 
 partie* lectureMemoire(int fd_error){
     down(mutex);
-    rc = rc + 1;
-    if(rc == 1) down(bd);
+    *rc = *rc + 1;
+    if(*rc == 1) down(bd);
     up(mutex);
     printf("Le nombre de joueur est :%d\n",part->nombreJoueur);
     printf("Le pseudo du joueur est :%s\n",(part->joueurs)[0].pseudo);
     printf("Le pseudo du joueur est :%s\n",(part->joueurs)[1].pseudo);
     printf("Le pseudo du joueur est :%s\n",(part->joueurs)[2].pseudo);
     down(mutex);
-    rc = rc - 1;
-    if(rc == 0) up(bd);
+    *rc = *rc - 1;
+    if(*rc == 0) up(bd);
     up(mutex);
     return part;
 }
@@ -100,7 +111,13 @@ void fermerMemoire(int fd_error){
         afficher_erreur(fd_error, "memoire-shmdt\n");
     }
     if((shmctl(shmid, IPC_RMID, NULL))<0){
-        afficher_erreur(fd_error, "memoire-shmctl");
+        afficher_erreur(fd_error, "memoire-shmctlServeur");
+    }
+    if((shmdt(rc))<0){
+        afficher_erreur(fd_error, "memoire-shmdt\n");
+    }
+    if((shmctl(shmidClient, IPC_RMID, NULL))<0){
+        afficher_erreur(fd_error, "memoire-shmctlClient");
     }
     if((semctl(mutex, IPC_RMID, 0))<0){
         afficher_erreur(fd_error, "memoire_semctl");
