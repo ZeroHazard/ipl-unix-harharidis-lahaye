@@ -1,26 +1,68 @@
+/*
+ * @authors Harharidis Mathieu Lahaye Maxime
+ *
+ */
+
 #include "memoire.h"
 
 
-struct sembuf memOp;
 int mem;
 key_t key;
+key_t keyBD;
+key_t keyMutex;
 int shmid;
 partie* part;
+int mutex;
+int bd;
+int rc;
 
+int down(int sem_id)
+{
+	struct sembuf sem_op;
+	sem_op.sem_num=0;
+	sem_op.sem_op=-1;
+	sem_op.sem_flg=0;
 
+	if(semop(sem_id, &sem_op, 1) == -1) {
+		printf("Erreur lors du down \n");
+		return -1;
+	}
+	else return 0;
+}
+
+int up(int sem_id)
+{
+	struct sembuf sem_op;
+	sem_op.sem_num=0;
+	sem_op.sem_op=+1;
+	sem_op.sem_flg=0;
+
+	if(semop(sem_id, &sem_op,1) == -1) {
+		printf("Erreur lors du up\n");
+		return -1;
+	}
+	else return 0;
+}
 
 void initMemoire(int fd_erreur, int serveur){
 //    part = initPartie(part);
-    key = ftok("./", 42);
+    key = ftok("./", 50000);
+    keyMutex = ftok("./", 50001);
+    keyBD = ftok("./", 50002);
     if(serveur == 1){
         if((shmid = shmget(key, sizeof(part), IPC_CREAT | 0666))<0){
             afficher_erreur(fd_erreur, "memoire-shmget\n");
-            part->nombreJoueur = 0;
         }
+        mutex = semget(keyMutex, 1,  IPC_CREAT | 0660);
+        bd = semget(keyBD, 1,  IPC_CREAT | 0660);
+        semctl(mutex, 0, SETVAL, 1);
+        semctl(bd, 0, SETVAL, 1);
     }else{
         if((shmid = shmget(key, sizeof(part), 0))<0){
             afficher_erreur(fd_erreur, "memoire-shmget\n");
         }
+        mutex = semget(keyMutex, 1, 0);
+        bd = semget(keyBD, 1, 0);
     }
     part = shmat(shmid, NULL, 0);
     if ((int) part < 0) {
@@ -30,80 +72,27 @@ void initMemoire(int fd_erreur, int serveur){
 
 //écrit dans la mémoire
 void ecritureMemoire(int fd_erreur, client* cl){
-    joueurs* j;
-    j = initJoueurs(cl->pseudo, fd_erreur);
-    part->nombreJoueur = part->nombreJoueur+1;
-    part->joueurs[part->nombreJoueur-1] = *j;
-    printf("SERVEUR-Le nombre de joueur est :%d\n",part->nombreJoueur);
-    printf("SERVEUR-Le pseudo du joueur est :%s\n",(part->joueurs)[0].pseudo);
-    printf("SERVEUR-Le pseudo du joueur est :%s\n",(part->joueurs)[1].pseudo);
-
-//    printf("SERVEUR-Le nombre de joueur est de : %d\n", part->nombreJoueur);
-    //    partie * ptr;
-    //    if((ptr = (partie *) shmat(qid,NULL,0))==(partie *) -1){
-    //        perror("Une erreur lors de la lecture de la mémoire");
-    //        exit(-1);
-    //    }
-    //    fprintf(stderr,"ecriture1\n");
-    //	memOp.sem_num = 0;
-    //	memOp.sem_flg = 0;
-    //        fprintf(stderr,"ecriture2\n");
-    //	memOp.sem_op = -1; // down
-    //        fprintf(stderr,"ecriture3\n");
-    //	SYS(semop(mem,&memOp,2)); // section critique
-    //        fprintf(stderr,"ecriture4\n");
-    //    memset(ptr, 0, sizeof(partie));
-    //        fprintf(stderr,"ecriture5\n");
-    //    memcpy(ptr,p, sizeof(partie));
-    //        fprintf(stderr,"ecriture6\n");
-    //	memOp.sem_op = 1; // up
-    //        fprintf(stderr,"ecriture7\n");
-    //	SYS(semop(mem,&memOp,2));// on en sort
-    //        fprintf(stderr,"ecriture8\n");
-    //    message * m = initMessage();
-    //        fprintf(stderr,"ecriture9\n");
-    //    m->type = MEMOIRE;
-    //        fprintf(stderr,"ecriture10\n");
-    //    writeToAllFils(p,m);
-    //        fprintf(stderr,"ecriture11\n");
-    //    free(m);
-    //        fprintf(stderr,"ecriture12\n");
+		joueurs* j;
+		j = initJoueurs(cl->pseudo, fd_erreur);
+		down(bd);
+		part->nombreJoueur = part->nombreJoueur+1;
+		part->joueurs[part->nombreJoueur-1] = *j;
+		up(bd);
 }
 
 partie* lectureMemoire(int fd_error){
-    printf("Le nombre de joueur est :%d\n",part->nombreJoueur);
-    printf("Le pseudo du joueur est :%s\n",(part->joueurs)[0].pseudo);
-    printf("Le pseudo du joueur est :%s\n",(part->joueurs)[1].pseudo);
-    return part;
-    //	memOp.sem_num = 0;
-    //	memOp.sem_flg = 0;
-    //	sop.sem_num = 0;
-    //	sop.sem_op = -1; // down
-    //	sop.sem_flg = 0;
-    //	SYS(semop(mutex,&sop,2)); // zone critique acces a rc
-    //	rc++;
-    //	if(rc == 1){
-    //		memOp.sem_op = -1; // down
-    //		SYS(semop(mem,&memOp,2));
-    //	}
-    //	sop.sem_op = 1; //up
-    //	SYS(semop(mutex,&sop,2)); // zone non critique
-    //
-    //    if ((ptr = (partie *) shmat(qid, NULL, 0)) == (partie *)-1){
-    //        perror("ipctool_shared_get.shmat:" );
-    //        return NULL;
-    //    }
-    //	sop.sem_op = -1; // down
-    //	SYS(semop(mutex,&sop,2)); // zone critique acces a rc
-    //	rc--;
-    //	if(rc == 0){
-    //		memOp.sem_op = 1; // up
-    //		SYS(semop(mem,&memOp,2));
-    //	}
-    //	sop.sem_op = 1; //up
-    //	SYS(semop(mutex,&sop,2)); // zone non critique
-    //    return ptr;
-    perror("BLABLA");
+		down(mutex);
+		rc = rc + 1;
+		if(rc == 1) down(bd);
+		up(mutex);
+		printf("Le nombre de joueur est :%d\n",part->nombreJoueur);
+		printf("Le pseudo du joueur est :%s\n",(part->joueurs)[0].pseudo);
+		printf("Le pseudo du joueur est :%s\n",(part->joueurs)[1].pseudo);
+		down(mutex);
+		rc = rc - 1;
+		if(rc == 0) up(&bd);
+		up(mutex);
+		return part;
 }
 
 void fermerMemoire(int fd_error){
