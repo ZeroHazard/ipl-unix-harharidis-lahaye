@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
 						for (i = 0; i < tabClient.tailleLogique; i++) {
 							send((tabClient.clients + i)->csocket, "BLABLA",
 									sizeof("BLABLA"), 0);
-							recv(part->joueurs[i].score, score, sizeof(score),
+							recv(part->joueurs[i].score, &score, sizeof(score),
 									0);
 							sleep(1);
 						}
