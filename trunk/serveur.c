@@ -144,8 +144,9 @@ int main(int argc, char *argv[])
 							part->joueurs[i].score = scoreR;
 							sleep(1);
 						}
-						autoriserLecture();
 						ecritureMemoireJoueurs(fd_error,part);
+						autoriserLecture();
+						sleep(2);
                     } else {
                         printf("Il n'y a pas assez de joueur pour commencer la partie\n");
                     }

@@ -106,7 +106,7 @@ void autoriserLecture(){
 
 partie* lectureMemoire(int fd_error){
 	partie* partieARenvoyer;
-	if(part->bool!=0){
+	if(part->bool==0){
 		down(mutex);
 		*rc = *rc + 1;
 		if(*rc == 1) down(bd);
