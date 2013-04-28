@@ -13,6 +13,6 @@ joueur* initJoueurs(char* s, int fd_erreur){
         afficher_erreur(fd_erreur, "joueur-malloc");
     }
     strcpy(joueurs->pseudo,s);
-    joueurs->score=0;
+    joueurs->score=-1;
     return joueurs;
 }

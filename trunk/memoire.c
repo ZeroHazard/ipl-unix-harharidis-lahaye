@@ -74,9 +74,11 @@ void initMemoire(int fd_erreur, int serveur){
         afficher_erreur(fd_erreur, "memoire-shmat\n");
     }
     part = shmat(shmid, NULL, 0);
+    /*
     if ((int) part < 0) {
         afficher_erreur(fd_erreur, "memoire-shmat\n");
     }
+    */
 }
 
 
@@ -85,6 +87,7 @@ void ecritureMemoireJoueurs(int fd_erreur, partie* partParam){
     *part = *partParam;
     printf("Le nombre de joueur est :%d\n",part->nombreJoueur);
     up(bd);
+    printf("Le score du joueur 0 est de : %d\n",part->joueurs[0].score);
 }
 
 partie* lectureMemoire(int fd_error){

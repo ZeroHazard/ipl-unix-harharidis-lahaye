@@ -51,9 +51,9 @@ int main(int argc, char *argv[])
             send(sock, &c, sizeof(c), 0);
             recv(sock, recu, sizeof(recu), 0);
             lectureMemoire(fd_error);
-	    recv(sock, recu, sizeof(recu), 0);	
-	    calculDuScore();
-	    send(sock, &score, sizeof(int), 0);	
+            recv(sock, recu, sizeof(recu), 0);
+            calculDuScore();
+            send(sock, &score, sizeof(int), 0);
         }
         else
             printf("Impossible de se connecter\n");
