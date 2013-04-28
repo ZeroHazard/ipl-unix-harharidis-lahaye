@@ -135,14 +135,16 @@ int main(int argc, char *argv[])
                             sleep(1);
                         }
                         // implementation future du jeu
+                        interdireLecture();
 						for (i = 0; i < tabClient.tailleLogique; i++) {
-							send((tabClient.clients + i)->csocket, "BLABLA",
-                                 sizeof("BLABLA"), 0);
+							send((tabClient.clients + i)->csocket, "FIN",
+                                 sizeof("FIN"), 0);
 							recv((tabClient.clients + i)->csocket, &scoreR, sizeof(int),
                                  0);
 							part->joueurs[i].score = scoreR;
 							sleep(1);
 						}
+						autoriserLecture();
 						ecritureMemoireJoueurs(fd_error,part);
                     } else {
                         printf("Il n'y a pas assez de joueur pour commencer la partie\n");
@@ -162,7 +164,6 @@ int main(int argc, char *argv[])
         }
         else
             afficher_erreur(fd_error,"serveur-socket\n");
-        
     }
     
     return EXIT_SUCCESS;

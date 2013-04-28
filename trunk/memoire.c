@@ -18,6 +18,7 @@ partie* part;
 semaphore mutex;
 semaphore bd;
 int* rc;
+int* bool;
 
 int down(int sem_id)
 {
@@ -83,28 +84,41 @@ void initMemoire(int fd_erreur, int serveur){
      */
 }
 
-
+// Ceci permet d'initialiser la partie et d'écrire tous les scores a la fin
 void ecritureMemoireJoueurs(int fd_erreur, partie* partParam){
     down(bd);
     *part = *partParam;
     printf("Le nombre de joueur est :%d\n",part->nombreJoueur);
     up(bd);
-    printf("Le score du joueur 0 est de : %d\n",part->joueurs[0].score);
+}
+
+void interdireLecture(){
+	down(bd);
+	part->bool=1;
+	up(bd);
+}
+
+void autoriserLecture(){
+	down(bd);
+	part->bool=0;
+	up(bd);
 }
 
 partie* lectureMemoire(int fd_error){
-    down(mutex);
-    *rc = *rc + 1;
-    if(*rc == 1) down(bd);
-    up(mutex);
-    printf("Le nombre de joueur est :%d\n",part->nombreJoueur);
-    printf("Le pseudo du joueur est :%s\n",(part->joueurs)[0].pseudo);
-    printf("Le pseudo du joueur est :%s\n",(part->joueurs)[1].pseudo);
-    down(mutex);
-    *rc = *rc - 1;
-    if(*rc == 0) up(bd);
-    up(mutex);
-    return part;
+	partie* partieARenvoyer;
+	if(part->bool!=0){
+		down(mutex);
+		*rc = *rc + 1;
+		if(*rc == 1) down(bd);
+		up(mutex);
+		partieARenvoyer=part;
+		down(mutex);
+		*rc = *rc - 1;
+		if(*rc == 0) up(bd);
+		up(mutex);
+		return partieARenvoyer;
+	}
+	return NULL;
 }
 
 void fermerMemoire(int fd_error){

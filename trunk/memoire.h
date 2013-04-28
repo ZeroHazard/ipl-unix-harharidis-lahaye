@@ -12,6 +12,10 @@
 void initMemoire();
 #endif
 
+
+void interdireLecture();
+void autoriserLecture();
+
 partie* lectureMemoire(int);
 void ecritureMemoireJoueurs(int, partie*);
 void removeMemoire(int, int);

@@ -13,6 +13,7 @@ partie* initPartie(partie* p){
     }
     p->nombreJoueur=0;
     //ecritureMemoire(p->memoire,p);
+    p->bool=0;
     return p;
 }
 
