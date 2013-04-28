@@ -80,12 +80,9 @@ void initMemoire(int fd_erreur, int serveur){
 }
 
 
-void ecritureMemoire(int fd_erreur, client* cl){
-    joueurs* j;
-    j = initJoueurs(cl->pseudo, fd_erreur);
+void ecritureMemoireJoueurs(int fd_erreur, partie* part){
     down(bd);
-    part->nombreJoueur = part->nombreJoueur+1;
-    part->joueurs[part->nombreJoueur-1] = *j;
+    *part = *part;
     printf("Le nombre de joueur est :%d\n",part->nombreJoueur);
     up(bd);
 }
@@ -98,7 +95,6 @@ partie* lectureMemoire(int fd_error){
     printf("Le nombre de joueur est :%d\n",part->nombreJoueur);
     printf("Le pseudo du joueur est :%s\n",(part->joueurs)[0].pseudo);
     printf("Le pseudo du joueur est :%s\n",(part->joueurs)[1].pseudo);
-    printf("Le pseudo du joueur est :%s\n",(part->joueurs)[2].pseudo);
     down(mutex);
     *rc = *rc - 1;
     if(*rc == 0) up(bd);
