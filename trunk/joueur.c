@@ -7,12 +7,12 @@
 #include "joueur.h"
 #include "util.h"
 
-joueurs* initJoueurs(char* s, int fd_erreur){
-    joueurs* joueur;
-    if((joueur = (joueurs*) malloc(sizeof(joueurs)))==NULL){
+joueur* initJoueurs(char* s, int fd_erreur){
+    joueur* joueurs;
+    if((joueurs = (joueur*) malloc(sizeof(joueur)))==NULL){
         afficher_erreur(fd_erreur, "joueur-malloc");
     }
-    strcpy(joueur->pseudo,s);
-    joueur->score=0;
-    return joueur;
+    strcpy(joueurs->pseudo,s);
+    joueurs->score=0;
+    return joueurs;
 }

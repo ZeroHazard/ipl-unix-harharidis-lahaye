@@ -15,7 +15,7 @@
 
 typedef struct partie {
     int nombreJoueur; //le nombre de joueur actif
-    joueurs joueurs[JOUEURS_MAX];
+    joueur joueurs[JOUEURS_MAX];
 }partie;
 
 partie* initPartie(partie*);

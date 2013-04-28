@@ -80,9 +80,9 @@ void initMemoire(int fd_erreur, int serveur){
 }
 
 
-void ecritureMemoireJoueurs(int fd_erreur, partie* part){
+void ecritureMemoireJoueurs(int fd_erreur, partie* partParam){
     down(bd);
-    *part = *part;
+    *part = *partParam;
     printf("Le nombre de joueur est :%d\n",part->nombreJoueur);
     up(bd);
 }

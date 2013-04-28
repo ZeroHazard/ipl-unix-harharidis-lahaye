@@ -8,10 +8,10 @@
 #ifndef JOUEURS_H_
 #define JOUEURS_H_
 #include "header.h"
-typedef struct joueurs{
+typedef struct joueur{
     char pseudo[50];
     int score;
-}joueurs;
-joueurs* initJoueurs(char*, int);
+}joueur;
+joueur* initJoueurs(char*, int);
 
 #endif /* JOUEURS_H_ */
