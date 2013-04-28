@@ -2,6 +2,9 @@
 #include "memoire.h"
 #include "util.h"
 
+int calculDuScore();
+int score;
+
 int main(int argc, char *argv[])
 {
     int erreur = 0;
@@ -48,6 +51,9 @@ int main(int argc, char *argv[])
             send(sock, &c, sizeof(c), 0);
             recv(sock, recu, sizeof(recu), 0);
             lectureMemoire(fd_error);
+	    recv(sock, recu, sizeof(recu), 0);	
+	    calculDuScore();
+	    send(sock, &score, sizeof(int), 0);	
         }
         else
             printf("Impossible de se connecter\n");
@@ -57,5 +63,9 @@ int main(int argc, char *argv[])
         printf("Fermeture du client terminée\n");
         return EXIT_SUCCESS;
     }
+}
+
+void calculDuScore(){
+	score=10;
 }
 
