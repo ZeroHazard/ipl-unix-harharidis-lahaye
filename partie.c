@@ -8,7 +8,6 @@
 
 //création d'une partie
 partie* initPartie(partie* p){
-    int i,j;
     if((p=(partie *)malloc(sizeof(partie)))==NULL){
         return NULL;
     }
