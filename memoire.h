@@ -1,3 +1,10 @@
+/********************************************************
+ *  memoire.h
+ *	dossier streams
+ * 	entete du fichier memoire.c
+ * 	Maxime LAHAYE, Mathieu HARHARIDIS
+ * 	avril 2013
+ ********************************************************/
 #ifndef ipl_lahaye_harharidis_memoire_h
 #define ipl_lahaye_harharidis_memoire_h
 #include <stdio.h>

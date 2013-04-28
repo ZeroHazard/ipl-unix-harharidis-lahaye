@@ -1,8 +1,10 @@
-/*
- * @authors Harharidis Mathieu Lahaye Maxime
- *
- *
- */
+/********************************************************
+ *  memoire.c
+ *	dossier streams
+ * 	methode de gestion de la mémoires partagée
+ * 	Maxime LAHAYE, Mathieu HARHARIDIS
+ * 	avril 2013
+ ********************************************************/
 
 #include "memoire.h"
 typedef int semaphore;
@@ -48,7 +50,6 @@ int up(int sem_id)
 }
 
 void initMemoire(int fd_erreur, int serveur){
-    //    part = initPartie(part);
     key = ftok("./", 50000);
     keyMutex = ftok("./", 50001);
     keyBD = ftok("./", 50002);
@@ -57,16 +58,28 @@ void initMemoire(int fd_erreur, int serveur){
         if((shmid = shmget(key, sizeof(part), IPC_CREAT | 0666))<0){
             afficher_erreur(fd_erreur, "memoire-shmget\n");
         }
-        mutex = semget(keyMutex, 1,  IPC_CREAT | 0660);
-        bd = semget(keyBD, 1,  IPC_CREAT | 0660);
-        semctl(mutex, 0, SETVAL, 1);
-        semctl(bd, 0, SETVAL, 1);
+        if((mutex = semget(keyMutex, 1,  IPC_CREAT | 0660))<0){
+            afficher_erreur(fd_erreur, "memoire-semget");
+        }
+        if((bd = semget(keyBD, 1,  IPC_CREAT | 0660))<0){
+            afficher_erreur(fd_erreur, "memoire-semget");
+        }
+        if((semctl(mutex, 0, SETVAL, 1))<0){
+            afficher_erreur(fd_erreur, "memoire-semctl");
+        }
+        if((semctl(bd, 0, SETVAL, 1))<0){
+            afficher_erreur(fd_erreur, "memoire-semctl");
+        }
     }else{ // le client
         if((shmid = shmget(key, sizeof(part), 0))<0){
             afficher_erreur(fd_erreur, "memoire-shmget\n");
         }
-        mutex = semget(keyMutex, 1, 0);
-        bd = semget(keyBD, 1, 0);
+        if((mutex = semget(keyMutex, 1, 0))<0){
+            afficher_erreur(fd_erreur, "memoire-semget");
+        }
+        if((bd = semget(keyBD, 1, 0))<0){
+            afficher_erreur(fd_erreur, "memoire-semget");
+        }
     }
     if((shmidClient = shmget(keyClient, sizeof(int), IPC_CREAT | 0666))<0){
         afficher_erreur(fd_erreur, "memoire-shmget\n");
@@ -77,11 +90,9 @@ void initMemoire(int fd_erreur, int serveur){
         afficher_erreur(fd_erreur, "memoire-shmat\n");
     }
     part = shmat(shmid, NULL, 0);
-    /*
-     if ((int) part < 0) {
-     afficher_erreur(fd_erreur, "memoire-shmat\n");
-     }
-     */
+    if ((int) part < 0) {
+        afficher_erreur(fd_erreur, "memoire-shmat\n");
+    }
 }
 
 // Ceci permet d'initialiser la partie et d'écrire tous les scores a la fin

@@ -140,10 +140,6 @@ int main(int argc, char *argv[])
 							part->joueurs[i].score = scoreR;
 							sleep(1);
 						}
-                        printf("Le serveur lit: %s\n", part->joueurs[0].pseudo);
-                        printf("Le serveur lit: %d\n", part->joueurs[0].score);
-                        printf("Le serveur lit: %s\n", part->joueurs[1].pseudo);
-                        printf("Le serveur lit: %d\n", part->joueurs[1].score);
 						ecritureMemoireJoueurs(fd_error,part);
                         autoriserLecture();
 						sleep(1);
