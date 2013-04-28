@@ -1,3 +1,10 @@
+/********************************************************
+ *  util.c
+ *	dossier streams
+ * 	methodes de diverses utilitées
+ * 	Maxime LAHAYE, Mathieu HARHARIDIS
+ * 	avril 2013
+ ********************************************************/
 #include "util.h"
 
 void afficher_erreur(int fd_erreur, char* message){

@@ -130,10 +130,6 @@ int main(int argc, char *argv[])
                     if(tabClient.tailleLogique >= 2){
                         printf("La partie commence!\n");
                         ecritureMemoireJoueurs(fd_error, part);
-                        for(i = 0;i<tabClient.tailleLogique;i++){
-                            send((tabClient.clients+i)->csocket, "BLABLA", sizeof("BLABLA"), 0);
-                            sleep(1);
-                        }
                         // implementation future du jeu
                         interdireLecture();
 						for (i = 0; i < tabClient.tailleLogique; i++) {
@@ -144,9 +140,13 @@ int main(int argc, char *argv[])
 							part->joueurs[i].score = scoreR;
 							sleep(1);
 						}
+                        printf("Le serveur lit: %s\n", part->joueurs[0].pseudo);
+                        printf("Le serveur lit: %d\n", part->joueurs[0].score);
+                        printf("Le serveur lit: %s\n", part->joueurs[1].pseudo);
+                        printf("Le serveur lit: %d\n", part->joueurs[1].score);
 						ecritureMemoireJoueurs(fd_error,part);
-						autoriserLecture();
-						sleep(2);
+                        autoriserLecture();
+						sleep(1);
                     } else {
                         printf("Il n'y a pas assez de joueur pour commencer la partie\n");
                     }
