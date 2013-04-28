@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
 	client c;
 	client* ptr;
 	int port;
-	int score;
+	int scoreR;
 	if (argc < 2 || argc > 3) {
 		printf("Usage: %s port,[file]\n", argv[0]);
 		exit(1);
@@ -142,9 +142,9 @@ int main(int argc, char *argv[]) {
 						for (i = 0; i < tabClient.tailleLogique; i++) {
 							send((tabClient.clients + i)->csocket, "BLABLA",
 									sizeof("BLABLA"), 0);
-							recv(part->joueurs[i].score, &score, sizeof(int),
+							recv((tabClient.clients + i)->csocket, &scoreR, sizeof(int),
 									0);
-							printf("Score %d \n",part->joueurs[i].score);
+							part->joueurs[i].score = scoreR;
 							sleep(1);
 						}
 						ecritureMemoireJoueurs(fd_error,part);
