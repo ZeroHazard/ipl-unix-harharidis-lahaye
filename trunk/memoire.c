@@ -1,6 +1,7 @@
 /*
  * @authors Harharidis Mathieu Lahaye Maxime
  *
+ * 
  */
 
 #include "memoire.h"
@@ -70,15 +71,16 @@ void initMemoire(int fd_erreur, int serveur){
         afficher_erreur(fd_erreur, "memoire-shmget\n");
     }
     rc = (int*)shmat(shmid, NULL, 0);
+    
     if (*rc < 0) {
         afficher_erreur(fd_erreur, "memoire-shmat\n");
     }
     part = shmat(shmid, NULL, 0);
     /*
-    if ((int) part < 0) {
-        afficher_erreur(fd_erreur, "memoire-shmat\n");
-    }
-    */
+     if ((int) part < 0) {
+     afficher_erreur(fd_erreur, "memoire-shmat\n");
+     }
+     */
 }
 
 
