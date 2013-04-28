@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
 	if (argc == 3) {
 		if ((fd_error = open(argv[2], O_CREAT | O_WRONLY, 0700)) == -1) {
 			afficher_erreur(fd_error,
-					"serveur-erreur lors de l'ouverture du fichier\n");
+                            "serveur-erreur lors de l'ouverture du fichier\n");
 			exit(1);
 		}
 	} else {
@@ -38,12 +38,12 @@ int main(int argc, char *argv[]) {
 		}
 		/* Création de la socket */
 		sock = socket(AF_INET, SOCK_STREAM, 0);
-
+        
 		/* Configuration de la connexion */
 		sin.sin_addr.s_addr = inet_addr("127.0.0.1");
 		sin.sin_family = AF_INET;
 		sin.sin_port = htons(port);
-
+        
 		/* Si le client arrive à se connecter */
 		if (connect(sock, (SOCKADDR*) &sin, sizeof(sin)) != SOCKET_ERROR) {
 			initMemoire(fd_error, 0);
@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
 			}
 		} else
 			printf("Impossible de se connecter\n");
-
+        
 		/* On ferme la socket précédemment ouverte */
 		close(sock);
 		printf("Fermeture du client terminée\n");

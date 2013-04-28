@@ -1,7 +1,7 @@
 /*
  * @authors Harharidis Mathieu Lahaye Maxime
  *
- * 
+ *
  */
 
 #include "memoire.h"
