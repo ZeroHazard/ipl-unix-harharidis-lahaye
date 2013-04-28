@@ -124,10 +124,10 @@ int main(int argc, char *argv[])
                             tabClient.tailleLogique--;
                         }
                     }
-                    ecritureMemoireJoueurs(fd_error, part);
                     if(tabClient.tailleLogique >= 2){
                         printf("La partie commence!\n");
                         for(i = 0;i<tabClient.tailleLogique;i++){
+                            ecritureMemoireJoueurs(fd_error, part);
                             send((tabClient.clients+i)->csocket, "BLABLA", sizeof("BLABLA"), 0);
                             sleep(1);
                         }
