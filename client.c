@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
     SOCKADDR_IN sin;
     int fd_error;
     int port;
+    partie* part;
     if(argc <2 || argc > 3){
         printf("Usage: %s port,[file]\n", argv[0]);
         exit(1);
@@ -49,11 +50,25 @@ int main(int argc, char *argv[])
             strcpy(c.pseudo,ligne);
             c.csocket = sock;
             send(sock, &c, sizeof(c), 0);
+            // Message pour faire lire le client (pour les tests)
             recv(sock, recu, sizeof(recu), 0);
             lectureMemoire(fd_error);
+            // Message pour signaler la fin de partie
             recv(sock, recu, sizeof(recu), 0);
             calculDuScore();
             send(sock, &score, sizeof(int), 0);
+            // Message pour faire lire le client dans la memoire partagee
+            // pour afficher les scores
+            while(1){
+				recv(sock, recu, sizeof(recu), 0);
+				if((part=lectureMemoire(fd_error))!=NULL){
+					break;
+				}
+				else{
+					sleep(1);
+				}
+            }
+            //lecture de la partie
         }
         else
             printf("Impossible de se connecter\n");
