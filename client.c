@@ -2,7 +2,7 @@
 #include "memoire.h"
 #include "util.h"
 
-int calculDuScore();
+void calculDuScore();
 int score;
 
 int main(int argc, char *argv[])
