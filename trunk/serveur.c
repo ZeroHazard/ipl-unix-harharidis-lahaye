@@ -10,7 +10,10 @@ typedef struct tabClient{
     int tailleLogique;
 }tabClient;
 void handler(int);
+void ajoutJoueur(client*);
 int boolean = 1;
+int fd_error;
+partie* part = NULL;
 int main(int argc, char *argv[])
 {
     int erreur = 0;
@@ -19,8 +22,6 @@ int main(int argc, char *argv[])
     client c;
     client* ptr;
     int port;
-    int fd_error;
-    partie* part = NULL;
     if(argc <2 || argc > 3){
         printf("Usage: %s port,[file]\n", argv[0]);
         exit(1);
@@ -103,7 +104,7 @@ int main(int argc, char *argv[])
                         ptr = tabClient.clients+tabClient.tailleLogique;
                         strcpy(ptr->pseudo,c.pseudo);
                         ptr->csocket = csock;
-                        ecritureMemoire(fd_error, ptr);
+                        ajoutJoueur(ptr);
                         printf("Vous avez bien été inscrit %s\n", ptr->pseudo);
                         tabClient.tailleLogique++;
                     }
@@ -123,6 +124,7 @@ int main(int argc, char *argv[])
                             tabClient.tailleLogique--;
                         }
                     }
+                    ecritureMemoireJoueurs(fd_error, part);
                     if(tabClient.tailleLogique >= 2){
                         printf("La partie commence!\n");
                         for(i = 0;i<tabClient.tailleLogique;i++){
@@ -151,6 +153,20 @@ int main(int argc, char *argv[])
     }
     
     return EXIT_SUCCESS;
+}
+
+void ajoutJoueur(client* cl){
+    joueurs* j;
+    j = initJoueurs(cl->pseudo, fd_error);
+    part->nombreJoueur = part->nombreJoueur+1;
+    part->joueurs[part->nombreJoueur-1] = *j;
+    printf("SERVEUR-Le nombre de joueur est :%d\n",part->nombreJoueur);
+    printf("SERVEUR-Le pseudo du joueur est :%s\n",(part->joueurs)[0].pseudo);
+    printf("SERVEUR-Le pseudo du joueur est :%s\n",(part->joueurs)[1].pseudo);
+}
+
+void suppressionJoueur(client* cl){
+    
 }
 
 

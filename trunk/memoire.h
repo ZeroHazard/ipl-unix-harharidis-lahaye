@@ -13,6 +13,6 @@ void initMemoire();
 #endif
 
 partie* lectureMemoire(int);
-void ecritureMemoire(int, client*);
+void ecritureMemoireJoueurs(int, partie*);
 void removeMemoire(int, int);
 void fermerMemoire(int);
