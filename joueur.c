@@ -8,11 +8,11 @@
 #include "util.h"
 
 joueur* initJoueurs(char* s, int fd_erreur){
-    joueur* joueurs;
-    if((joueurs = (joueur*) malloc(sizeof(joueur)))==NULL){
+    joueur* j;
+    if((j= (joueur*) malloc(sizeof(joueur)))==NULL){
         afficher_erreur(fd_erreur, "joueur-malloc");
     }
-    strcpy(joueurs->pseudo,s);
-    joueurs->score=-1;
-    return joueurs;
+    strcpy(j->pseudo,s);
+    j->score=-1;
+    return j;
 }
