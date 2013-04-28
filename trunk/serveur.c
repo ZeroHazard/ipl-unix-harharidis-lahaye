@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
     client c;
     client* ptr;
     int port;
+    int score;
     if(argc <2 || argc > 3){
         printf("Usage: %s port,[file]\n", argv[0]);
         exit(1);
@@ -129,11 +130,18 @@ int main(int argc, char *argv[])
                         for(i = 0;i<tabClient.tailleLogique;i++){
                             ecritureMemoireJoueurs(fd_error, part);
                             send((tabClient.clients+i)->csocket, "BLABLA", sizeof("BLABLA"), 0);
-                            sleep(1);
+                            sleep(1);			    	
                         }
+			// implementation future du jeu
+		        for(i = 0;i<tabClient.tailleLogique;i++){
+                            send((tabClient.clients+i)->csocket, "BLABLA", sizeof("BLABLA"), 0);
+			    recv(part->joueurs[i].score, score, sizeof(ligne),0);
+                            sleep(1);			    	
+                        }			
                     } else {
                         printf("Il n'y a pas assez de joueur pour commencer la partie\n");
                     }
+		    	
                 }
                 else
                     afficher_erreur(fd_error,"serveur-listen\n");
