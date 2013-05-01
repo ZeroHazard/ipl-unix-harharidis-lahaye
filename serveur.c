@@ -3,6 +3,7 @@
 #include "util.h"
 #include <signal.h>
 #include "partie.h"
+#include "partie.h"
 #define JOUEURS_MAX 5
 #define TEMPS 30
 void suppressionJoueur(client* cl);
@@ -11,15 +12,17 @@ typedef struct tabClient {
 	int tailleLogique;
 } tabClient;
 void handler(int);
+void jeu();
 void ajoutJoueur(client*);
 int boolean = 1;
 int fd_error;
 partie* part = NULL;
+tabClient tabClients;
+
 int main(int argc, char *argv[])
 {
     int erreur = 0;
     int i;
-    tabClient tabClient;
     client c;
     client* ptr;
     int port;
@@ -37,11 +40,11 @@ int main(int argc, char *argv[])
         fd_error = dup(2);
     }
     port = atoi(argv[1]);
-    if((ptr = tabClient.clients = (client*)malloc(JOUEURS_MAX*sizeof(client)))==NULL){
+    if((ptr = tabClients.clients = (client*)malloc(JOUEURS_MAX*sizeof(client)))==NULL){
         afficher_erreur(fd_error,"serveur-malloc\n");
         exit(1);
     }
-    tabClient.tailleLogique = 0;
+    tabClients.tailleLogique = 0;
     /* Socket et contexte d'adressage du serveur */
     SOCKADDR_IN sin;
     SOCKET sock;
@@ -93,7 +96,7 @@ int main(int argc, char *argv[])
                         //Si c'est le premier inscrit on lance l'alarm
                         // La condition du while est un boolean qu'on mettra a fals dans la methode handler
                         //Gerer la deconnexion d'un joueur en inscription
-                        if(tabClient.tailleLogique == 0){
+                        if(tabClients.tailleLogique == 0){
                             alarm(TEMPS);
                         }
                         if((csock = accept(sock, (SOCKADDR*)&csin, &crecsize))<0){
@@ -103,39 +106,39 @@ int main(int argc, char *argv[])
                         if(recv(csock, &c, sizeof(c), 0)<0){
                             afficher_erreur(fd_error,"serveur-recv\n");
                         }
-                        ptr = tabClient.clients+tabClient.tailleLogique;
+                        ptr = tabClients.clients+tabClients.tailleLogique;
                         strcpy(ptr->pseudo,c.pseudo);
                         ptr->csocket = csock;
                         ajoutJoueur(ptr);
                         printf("Vous avez bien été inscrit %s\n", ptr->pseudo);
-                        tabClient.tailleLogique++;
+                        tabClients.tailleLogique++;
                     }
                     //On regarde si tous le clients sont toujours connectés
-                    for (i=0; i<tabClient.tailleLogique; i++) {
+                    for (i=0; i<tabClients.tailleLogique; i++) {
                         char ligne[1024]= "";
-                        if((recv((tabClient.clients+i)->csocket, ligne, sizeof(ligne), MSG_DONTWAIT))==0){
-                            suppressionJoueur(tabClient.clients+i);
-                            printf("Deconnexion du joueur: %s\n", (tabClient.clients+i)->pseudo);
-                            if(i==tabClient.tailleLogique){
+                        if((recv((tabClients.clients+i)->csocket, ligne, sizeof(ligne), MSG_DONTWAIT))==0){
+                            suppressionJoueur(tabClients.clients+i);
+                            printf("Deconnexion du joueur: %s\n", (tabClients.clients+i)->pseudo);
+                            if(i==tabClients.tailleLogique){
                                 ptr--;
                             }else{
-                                client ptr3 = *(tabClient.clients+tabClient.tailleLogique-1);
-                                *(tabClient.clients+i) = ptr3;
+                                client ptr3 = *(tabClients.clients+tabClients.tailleLogique-1);
+                                *(tabClients.clients+i) = ptr3;
                                 ptr--;
                                 i--;
                             }
-                            tabClient.tailleLogique--;
+                            tabClients.tailleLogique--;
                         }
                     }
-                    if(tabClient.tailleLogique >= 2){
+                    if(tabClients.tailleLogique >= 2){
                         printf("La partie commence!\n");
                         ecritureMemoireJoueurs(fd_error, part);
-                        // implementation future du jeu
+                        jeu();
                         interdireLecture();
-						for (i = 0; i < tabClient.tailleLogique; i++) {
-							send((tabClient.clients + i)->csocket, "FIN",
+						for (i = 0; i < tabClients.tailleLogique; i++) {
+							send((tabClients.clients + i)->csocket, "FIN",
                                  sizeof("FIN"), 0);
-							recv((tabClient.clients + i)->csocket, &scoreR, sizeof(int),
+							recv((tabClients.clients + i)->csocket, &scoreR, sizeof(int),
                                  0);
 							part->joueurs[i].score = scoreR;
 							sleep(1);
@@ -165,6 +168,15 @@ int main(int argc, char *argv[])
     
     return EXIT_SUCCESS;
 }
+
+void jeu(){
+    int tuileEncours = 0;
+    initTuiles(fd_error);
+    tuileEncours = tirerTuile(fd_error);
+    printf("%d", tuileEncours);
+}
+
+
 void suppressionJoueur(client* cl){
     int i;
     for (i = 0; i<part->nombreJoueur; i++) {

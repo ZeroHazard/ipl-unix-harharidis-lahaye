@@ -20,6 +20,8 @@ typedef struct partie {
 }partie;
 
 partie* initPartie(partie*);
+void initTuiles(int);
+int tirerTuile(int);
 
 
 #endif /* PARTIE_H_ */
