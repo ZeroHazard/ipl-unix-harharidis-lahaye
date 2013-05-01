@@ -15,6 +15,6 @@ typedef struct message {
     int type;
     char data[BUFFERSIZE];
 }message;
-
+void reinitMessage(message* m);
 
 #endif /* MESSAGE_H_ */

@@ -17,6 +17,7 @@ message * initMessage(){
     reinitMessage(m);
     return m;
 }
+
 void reinitMessage(message* m){
     m->type=-1;
     strncpy(m->data,"\0",1);
