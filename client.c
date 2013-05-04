@@ -1,20 +1,25 @@
 #include "header.h"
 #include "memoire.h"
 #include "util.h"
+#include "message.h"
 
 void calculDuScore();
+void closeSocket();
 int score;
+SOCKET sock;
 
 int main(int argc, char *argv[]) {
 	int erreur = 0;
 	char ligne[tailleLigne];
 	char recu[tailleLigne];
 	client c;
-	SOCKET sock;
 	SOCKADDR_IN sin;
 	int fd_error;
 	int port;
 	int k;
+    int i;
+    message mTuile;
+    message mConf;
 	partie* part;
 	if (argc < 2 || argc > 3) {
 		printf("Usage: %s port,[file]\n", argv[0]);
@@ -50,8 +55,23 @@ int main(int argc, char *argv[]) {
 			strcpy(c.pseudo, ligne);
 			c.csocket = sock;
 			send(sock, &c, sizeof(c), 0);
+            for (i=0; i<20; i++) {
+                // On recoit la tuile tiré par le serveur
+                if((recv(sock, &mTuile, sizeof(mTuile), 0))==0){
+                    closeSocket();
+                    afficher_erreur(fd_error, "client-recv\n");
+                }
+                printf("La tuile est :%s\n", mTuile.data);
+                strcpy(mConf.data,"Confirmation du client!");
+                mConf.type = CONFCHOIXTUILE;
+                send(sock, &mConf, sizeof(mConf), 0);
+            }
+            
 			// Message pour signaler la fin de partie
-			recv(sock, recu, sizeof(recu), 0);
+			if((recv(sock, recu, sizeof(recu), 0))==0){
+                closeSocket();
+                afficher_erreur(fd_error, "client-recv\n");
+            }
 			calculDuScore();
 			send(sock, &score, sizeof(int), 0);
 			// Message pour faire lire le client dans la memoire partagee
@@ -72,10 +92,14 @@ int main(int argc, char *argv[]) {
 			printf("Impossible de se connecter\n");
         
 		/* On ferme la socket précédemment ouverte */
-		close(sock);
-		printf("Fermeture du client terminée\n");
+		closeSocket();
 		return EXIT_SUCCESS;
 	}
+}
+
+void closeSocket(){
+    close(sock);
+    printf("Fermeture du client terminée\n");
 }
 
 void calculDuScore() {
