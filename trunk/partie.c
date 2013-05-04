@@ -29,6 +29,7 @@ void initTuiles(int fd_error){
     }
     for (i = 0; i < 40; i++) {
         *(tuiles + i) = j;
+//        printf("%d  ", *(tuiles + i));
         if(j > 10 && j < 20){
             if(k< 2) {
                 k++;
@@ -43,10 +44,16 @@ void initTuiles(int fd_error){
 }
 
 int tirerTuile(int fd_error){
-    int position = rand() % nbrTuiles+1;
+//    printf("[");
+//    for (int i=0; i<nbrTuiles; i++) {
+//        printf("%d  ", *(tuiles + i));
+//    }
+//    printf("]\n");
+    int position = rand() % nbrTuiles;
     int tuile = *(tuiles+position);
-    *(tuiles+position) = *(tuiles+nbrTuiles);
+    *(tuiles+position) = *(tuiles+nbrTuiles-1);
     nbrTuiles--;
+//    printf("[%d] %d  \n", position, tuile);
     return tuile;
 }
 
