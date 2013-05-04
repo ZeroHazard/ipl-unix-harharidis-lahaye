@@ -90,9 +90,11 @@ void initMemoire(int fd_erreur, int serveur){
         afficher_erreur(fd_erreur, "memoire-shmat\n");
     }
     part = shmat(shmid, NULL, 0);
+    /*
     if ((int) part < 0) {
         afficher_erreur(fd_erreur, "memoire-shmat\n");
     }
+    */
 }
 
 // Ceci permet d'initialiser la partie et d'écrire tous les scores a la fin
