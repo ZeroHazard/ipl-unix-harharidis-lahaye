@@ -10,12 +10,12 @@ void positionnerTuile(int);
 int score;
 int tabPosition[20] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 int tabScore[20] = { 0, 1, 3, 5, 7, 9, 11, 15, 20, 25, 30,
-		35, 40, 50, 60, 70, 85, 100, 150, 300};
+    35, 40, 50, 60, 70, 85, 100, 150, 300};
 SOCKET sock;
 void int_handler(int null);
 int fd_error;
 message mTuile;
-int position=0;
+int position=1;
 
 int main(int argc, char *argv[]) {
 	int erreur = 0;
@@ -24,9 +24,8 @@ int main(int argc, char *argv[]) {
 	client c;
 	SOCKADDR_IN sin;
 	int port;
-	int k;
     int i;
-
+    
     message mConf;
 	partie* part;
 	if (argc < 2 || argc > 3) {
@@ -47,11 +46,15 @@ int main(int argc, char *argv[]) {
 	if (!erreur) {
 		printf("Veuillez entrez votre pseudo de jeu\n");
 		if (fgets(ligne, tailleLigne, stdin) == NULL ) {
+            closeSocket();
 			afficher_erreur(fd_error, "client-fgets-pseudo\n");
 			exit(1);
 		}
 		/* Création de la socket */
-		sock = socket(AF_INET, SOCK_STREAM, 0);
+		if((sock = socket(AF_INET, SOCK_STREAM, 0))<0){
+            closeSocket();
+            afficher_erreur(fd_error, "client-socket");
+        }
         
 		/* Configuration de la connexion */
 		sin.sin_addr.s_addr = inet_addr("127.0.0.1");
@@ -63,7 +66,10 @@ int main(int argc, char *argv[]) {
 			initMemoire(fd_error, 0);
 			strcpy(c.pseudo, ligne);
 			c.csocket = sock;
-			send(sock, &c, sizeof(c), 0);
+			if((send(sock, &c, sizeof(c), 0))<0){
+                closeSocket();
+                afficher_erreur(fd_error, "client-send");
+            }
             for (i=0; i<20; i++) {
                 // On recoit la tuile tiré par le serveur
                 if((recv(sock, &mTuile, sizeof(mTuile), 0))==0){
@@ -73,7 +79,10 @@ int main(int argc, char *argv[]) {
                 positionnerTuile(0);
                 strcpy(mConf.data,"Confirmation du client! \n");
                 mConf.type = CONFCHOIXTUILE;
-                send(sock, &mConf, sizeof(mConf), 0);
+                if((send(sock, &mConf, sizeof(mConf), 0))<0){
+                    closeSocket();
+                    afficher_erreur(fd_error, "client-send");
+                }
             }
             
 			// Message pour signaler la fin de partie
@@ -92,10 +101,15 @@ int main(int argc, char *argv[]) {
 					sleep(1);
 				}
 			}
-			printf("Nombre de joueurs :%d\n", part->nombreJoueur);
+			int k;
+			printf("Tableau de tuiles \n");
+			for(k=0;k<20;k++){
+				printf("P:%d T:%d \n",k+1,tabPosition[k]);
+			}
+			printf("FIN\n");
+			printf("TABLEAU DES SCORES\n");
 			for (k = 0; k < part->nombreJoueur; k++) {
-				printf("Pseudo :%s\n", part->joueurs[k].pseudo);
-				printf("Score :%d\n", part->joueurs[k].score);
+				printf("Pseudo :%s\t Score :%d\n", part->joueurs[k].pseudo,part->joueurs[k].score);
 			}
 		} else
 			printf("Impossible de se connecter\n");
@@ -107,27 +121,27 @@ int main(int argc, char *argv[]) {
 }
 
 void calculDuScore() {
-	    int i;
-	    int serie = 1;
-	    int valPrec = tabPosition[0];
-	    if(valPrec == 31){
-	        valPrec = tabPosition[1];
-	    }
-	    int valCourante;
-	    for (i=1; i<20; i++) {
-	        valCourante = tabPosition[i];
-	        if(valCourante == 31){
-	            valCourante = valPrec;
-	        }
-	        if(valCourante >= valPrec){
-	            serie++;
-	        } else {
-	            score += tabScore[serie-1];
-	            serie = 1;
-	        }
-	        valPrec = valCourante;
-	    }
-	    score += tabScore[serie-1];
+    int i;
+    int serie = 1;
+    int valPrec = tabPosition[0];
+    if(valPrec == 31){
+        valPrec = tabPosition[1];
+    }
+    int valCourante;
+    for (i=1; i<20; i++) {
+        valCourante = tabPosition[i];
+        if(valCourante == 31){
+            valCourante = valPrec;
+        }
+        if(valCourante >= valPrec){
+            serie++;
+        } else {
+            score += tabScore[serie-1];
+            serie = 1;
+        }
+        valPrec = valCourante;
+    }
+    score += tabScore[serie-1];
 }
 
 
@@ -139,25 +153,25 @@ void positionnerTuile(int bool){
 		printf("La tuile est :%s\n Veuillez entrer la position à laquelle vous voulez insérer la tuile\n", mTuile.data);
 	}
 	/*
-	if (fgets(ligne, tailleLigne, stdin) == NULL ){
-		afficher_erreur(fd_error, "serveur-fgets-position\n");
-		exit(1);
-	}
-
-	int position;
-	// penser à peut-être utiliser strtol a la place
-	position = atoi(ligne);
-	*/
+     if (fgets(ligne, tailleLigne, stdin) == NULL ){
+     afficher_erreur(fd_error, "serveur-fgets-position\n");
+     exit(1);
+     }
+     
+     int position;
+     // penser à peut-être utiliser strtol a la place
+     position = atoi(ligne);
+     */
 	int numTuile;
 	numTuile = atoi(mTuile.data);
-	if(tabPosition[position]==-1) {
+	if(tabPosition[position-1]==-1) {
 		// position-1  car la table commence à 0
 		tabPosition[position-1] = numTuile;
 		printf("Position : %d numTuile : %d \n",position,numTuile);
-	} else if(tabPosition[position+1]==-1){
+	} else if(tabPosition[position]==-1){
 		tabPosition[position] = numTuile;
 		printf("La case était déjà prise, la tuile a été positionné à la case suivante \n");
-		printf("Position : %d numTuile : %d \n",position+1,numTuile);
+		printf("Position : %d numTuile : %d \n",position,numTuile);
 	} else {
 		positionnerTuile(1);
 	}
