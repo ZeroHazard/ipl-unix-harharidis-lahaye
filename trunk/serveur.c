@@ -99,16 +99,11 @@ int main(int argc, char *argv[])
                     sigaction(SIGALRM,&sa,NULL);
                     initMemoire(fd_error,1);
                     while(boolean == 1){
-                        //Si c'est le premier inscrit on lance l'alarm
-                        // La condition du while est un boolean qu'on mettra a fals dans la methode handler
-                        //Gerer la deconnexion d'un joueur en inscription
-                        if(tabClients.tailleLogique == 0){
-                            alarm(TEMPS);
-                        }
                         if((csock = accept(sock, (SOCKADDR*)&csin, &crecsize))<0){
                             break;
                         }
                         printf("Un client se connecte avec la socket %d de %s:%d\n", csock, inet_ntoa(csin.sin_addr), htons(csin.sin_port));
+                        
                         if(recv(csock, &c, sizeof(c), 0)<0){
                             afficher_erreur(fd_error,"serveur-recv\n");
                         }
@@ -117,6 +112,9 @@ int main(int argc, char *argv[])
                         ptr->csocket = csock;
                         FD_SET(csock,&setClient);
                         ajoutJoueur(ptr);
+                        if(tabClients.tailleLogique == 0){
+                            alarm(TEMPS);
+                        }
                         printf("Vous avez bien été inscrit %s\n", ptr->pseudo);
                         tabClients.tailleLogique++;
                     }
@@ -144,10 +142,16 @@ int main(int argc, char *argv[])
                         //                        printf("")
                         interdireLecture();
 						for (i = 0; i < tabClients.tailleLogique; i++) {
-							send((tabClients.clients + i)->csocket, "FIN",
-                                 sizeof("FIN"), 0);
-							recv((tabClients.clients + i)->csocket, &scoreR, sizeof(int),
-                                 0);
+							if((send((tabClients.clients + i)->csocket, "FIN",
+                                     sizeof("FIN"), 0))<0){
+                                closeSocket();
+                                afficher_erreur(fd_error, "serveur-send");
+                            }
+							if((recv((tabClients.clients + i)->csocket, &scoreR, sizeof(int),
+                                     0))<0){
+                                closeSocket();
+                                afficher_erreur(fd_error, "serveur-recv");
+                            }
 							part->joueurs[i].score = scoreR;
 							sleep(1);
 						}
@@ -170,7 +174,7 @@ int main(int argc, char *argv[])
         else
             afficher_erreur(fd_error,"serveur-socket\n");
     }
-    
+    printf("FIN SERVEUR\n");
     return EXIT_SUCCESS;
 }
 
@@ -241,7 +245,6 @@ void jeu(){
                 }
             }
             if(nbrJoueurs == 0){
-                printf("Je break\n");
                 break;
             }
 		}
@@ -251,9 +254,11 @@ void jeu(){
 void envoiClients(message m){
     int i;
     for (i=0; i<tabClients.tailleLogique; i++) {
-        send((tabClients.clients+i)->csocket, &m, sizeof(m), 0);
+        if((send((tabClients.clients+i)->csocket, &m, sizeof(m), 0))<0){
+            closeSocket();
+            afficher_erreur(fd_error, "serveur-envoiClient-send");
+        }
     }
-    printf("Je sors\n");
 }
 
 void suppressionJoueur(client* cl){
