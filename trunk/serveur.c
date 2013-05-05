@@ -102,13 +102,13 @@ int main(int argc, char *argv[])
                         if((csock = accept(sock, (SOCKADDR*)&csin, &crecsize))<0){
                             break;
                         }
+                        // Le serveur envoie un message de confirmation de la connexion
                         send(csock,"Vous etes bien connecté",sizeof("Vous etes bien connecté"), 0);
                         printf("Un client se connecte avec la socket %d de %s:%d\n", csock, inet_ntoa(csin.sin_addr), htons(csin.sin_port));
-
+                        // Le serveur recoit la structure client de celui qui s'est connecté
                         if(recv(csock, &c, sizeof(c), 0)<0){
                             afficher_erreur(fd_error,"serveur-recv\n");
                         }
-
                         ptr = tabClients.clients+tabClients.tailleLogique;
                         strcpy(ptr->pseudo,c.pseudo);
                         ptr->csocket = csock;
