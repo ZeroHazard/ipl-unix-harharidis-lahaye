@@ -13,6 +13,7 @@
 #define TUILE 3
 #define CONFCHOIXTUILE 4
 #define SCORE 5
+#define DEBUTPARTIE 6;
 
 
 #include "partie.h"
