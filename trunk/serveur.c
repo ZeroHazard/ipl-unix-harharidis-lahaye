@@ -192,11 +192,22 @@ void closeSocket(){
 
 
 void jeu(){
+
+
     int i;
     int tuileEncours = 0;
     message mTuile;
     message mConf;
+    message debut;
+
+    // envoi du message de debut de partie
+	sprintf(debut.data, "La partie commence ! \n");
+	debut.type = DEBUTPARTIE;
+	envoiClients(debut);
+
+    // initialisation des tuiles
     initTuiles(fd_error);
+
     for (i=0; i<20; i++) {
         tuileEncours = tirerTuile(fd_error);
         mTuile.type = TUILE;

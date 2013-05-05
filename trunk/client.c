@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
 		sin.sin_family = AF_INET;
 		sin.sin_port = htons(port);
 		char conf[100];
-		char debut[100];
+		message debut;
 		fd_set setServ;
 		FD_SET(sock, &setServ);
 		struct timeval tv;
@@ -100,11 +100,11 @@ int main(int argc, char *argv[]) {
 				afficher_erreur(fd_error, "client-send");
 			}
 			// Message de debut de partie
-			if ((recv(sock, &debut, sizeof(debut), 0)) == 0) {
+			if ((recv(sock, &debut, sizeof(message), 0)) == 0) {
 				closeSocket();
 				afficher_erreur(fd_error, "client-recv\n");
 			}
-			printf("%s\n", debut);
+			printf("%s\n", debut.data);
 			for (i = 0; i < 20; i++) {
 				// On recoit la tuile tiré par le serveur
 				if ((recv(sock, &mTuile, sizeof(mTuile), 0)) == 0) {
@@ -182,11 +182,13 @@ void calculDuScore() {
 	score += tabScore[serie - 1];
 }
 
-void positionnerTuile(int bool) {
+void positionnerTuile(int err) {
 	char ligne[tailleLigne];
-	if (bool == 1) {
+	if (err == 1) {
 		printf(
 				"La case est déjà prise, veuillez entrer une autre position ! :) \n");
+	} else if(err==2){
+		printf("Veuillez entrer un chiffre entre 1 et 20 ! :) \n");
 	} else {
 		printf(
 				"La tuile est :%s\n Veuillez entrer la position à laquelle vous voulez insérer la tuile\n",
@@ -199,6 +201,9 @@ void positionnerTuile(int bool) {
 	int position;
 	// penser à peut-être utiliser strtol a la place
 	position = atoi(ligne);
+	if(position<1 || position>20){
+		positionnerTuile(2);
+	}
 	int numTuile;
 	numTuile = atoi(mTuile.data);
 	if (tabPosition[position - 1] == -1) {
