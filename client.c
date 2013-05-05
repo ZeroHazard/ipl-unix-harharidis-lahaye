@@ -75,26 +75,36 @@ int main(int argc, char *argv[]) {
 			initMemoire(fd_error, 0);
 			strcpy(c.pseudo, ligne);
 			c.csocket = sock;
+			// En attente de la confirmation de la connexion
 			if ((select(sock + 1, &setServ, NULL, NULL, &tv)) == -1) {
-				afficher_erreur(fd_error, "serveur-jeu-select\n");
+				afficher_erreur(fd_error, "client-connect\n");
 			}
 			fd_set copySet = setServ;
+			//Quand le timeout du select est fini si le serveur a bien envoyé un message de conf
+			// On continue
 			if (FD_ISSET(sock, &copySet)) {
-				printf("Kikoo\n");
 				if ((recv(sock, &conf, sizeof(conf), 0)) == 0) {
 					closeSocket();
 					afficher_erreur(fd_error, "client-recv\n");
 				}
+				// sinon on stoppe le client
 			} else {
 				printf("Partie en cours \n");
 				closeSocket();
 				return EXIT_SUCCESS;
 			}
 			printf("%s\n", conf);
+			// le client envoie ses informations via structure client
 			if ((send(sock, &c, sizeof(c), 0)) < 0) {
 				closeSocket();
 				afficher_erreur(fd_error, "client-send");
 			}
+			// Message de debut de partie
+			if ((recv(sock, &debut, sizeof(debut), 0)) == 0) {
+				closeSocket();
+				afficher_erreur(fd_error, "client-recv\n");
+			}
+			printf("%s\n", debut);
 			for (i = 0; i < 20; i++) {
 				// On recoit la tuile tiré par le serveur
 				if ((recv(sock, &mTuile, sizeof(mTuile), 0)) == 0) {
