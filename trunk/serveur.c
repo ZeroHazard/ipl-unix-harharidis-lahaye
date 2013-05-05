@@ -6,7 +6,7 @@
 #include "partie.h"
 #include "message.h"
 #define JOUEURS_MAX 5
-#define TEMPS 30
+#define TEMPS 10
 void suppressionJoueur(client* cl);
 typedef struct tabClient {
 	client* clients;
@@ -102,11 +102,13 @@ int main(int argc, char *argv[])
                         if((csock = accept(sock, (SOCKADDR*)&csin, &crecsize))<0){
                             break;
                         }
+                        send(csock,"Vous etes bien connecté",sizeof("Vous etes bien connecté"), 0);
                         printf("Un client se connecte avec la socket %d de %s:%d\n", csock, inet_ntoa(csin.sin_addr), htons(csin.sin_port));
-                        
+
                         if(recv(csock, &c, sizeof(c), 0)<0){
                             afficher_erreur(fd_error,"serveur-recv\n");
                         }
+
                         ptr = tabClients.clients+tabClients.tailleLogique;
                         strcpy(ptr->pseudo,c.pseudo);
                         ptr->csocket = csock;
@@ -139,7 +141,6 @@ int main(int argc, char *argv[])
                         printf("La partie commence!\n");
                         ecritureMemoireJoueurs(fd_error, part);
                         jeu();
-                        //                        printf("")
                         interdireLecture();
 						for (i = 0; i < tabClients.tailleLogique; i++) {
 							if((send((tabClients.clients + i)->csocket, "FIN",
@@ -219,7 +220,7 @@ void jeu(){
 		}
 		while(1){
             copySet = setClient;
-			if((retval=select(maxValSock+1,&copySet,NULL,NULL,NULL))==-1){
+			if((select(maxValSock+1,&copySet,NULL,NULL,NULL))==-1){
                 afficher_erreur(fd_error,"serveur-jeu-select\n");
 			}
             for(k=0;k<tabClients.tailleLogique;k++){
@@ -235,13 +236,10 @@ void jeu(){
                             ptr--;
                             i--;
                         }
-                        printf("yo\n");
                         tabClients.tailleLogique--;
                         nbrJoueurs--;
                     }
-                    printf("Le serveur recoit:%s\n", mConf.data);
                     nbrJoueurs--;
-                    printf("nbrJoueur = %d\n", nbrJoueurs);
                 }
             }
             if(nbrJoueurs == 0){
@@ -289,4 +287,5 @@ void handler(int null){
 
 void int_handler(int null){
     closeSocket();
+    exit(1);
 }
