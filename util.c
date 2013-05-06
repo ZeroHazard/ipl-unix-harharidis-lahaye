@@ -1,7 +1,7 @@
 /********************************************************
  *  util.c
  *	dossier streams
- * 	methodes utilitaire
+ * 	methode utilitaire
  * 	Maxime LAHAYE, Mathieu HARHARIDIS
  * 	avril 2013
  ********************************************************/

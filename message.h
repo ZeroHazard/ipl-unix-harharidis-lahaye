@@ -1,9 +1,10 @@
-/*
- * message.h
- *
- *  Created on: Apr 25, 2013
- *      Author: afro
- */
+/********************************************************
+ *  message.h
+ *	dossier streams
+ * 	définition d'une structure message ainsi que de différents types
+ * 	Maxime LAHAYE, Mathieu HARHARIDIS
+ * 	avril 2013
+ ********************************************************/
 
 #ifndef MESSAGE_H_
 #define MESSAGE_H_
@@ -23,6 +24,4 @@ typedef struct message {
     int type;
     char data[BUFFERSIZE];
 }message;
-void reinitMessage(message*, int, char*);
-message * initMessage(int,char*);
 #endif /* MESSAGE_H_ */

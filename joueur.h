@@ -1,9 +1,10 @@
-/*
- * joueurs.h
- *
- *  Created on: Apr 25, 2013
- *      Author: afro
- */
+/********************************************************
+ *  util.c
+ *	dossier streams
+ * 	définition d'une structure de joueur ainsi que d'une méthode de création de joueur
+ * 	Maxime LAHAYE, Mathieu HARHARIDIS
+ * 	avril 2013
+ ********************************************************/
 
 #ifndef JOUEURS_H_
 #define JOUEURS_H_

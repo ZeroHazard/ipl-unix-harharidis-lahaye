@@ -1,9 +1,10 @@
-/*
- * partie.c
- *
- *  Created on: Apr 25, 2013
- *      Author: afro
- */
+/********************************************************
+ *  partie.c
+ *	dossier streams
+ * 	methodes permettant de gérer une partie
+ * 	Maxime LAHAYE, Mathieu HARHARIDIS
+ * 	avril 2013
+ ********************************************************/
 #include "partie.h"
 #include "util.h"
 int* tuiles = NULL;

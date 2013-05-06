@@ -1,3 +1,11 @@
+/********************************************************
+ *  header.h
+ *	dossier streams
+ * 	Le fichier header du client et du serveur contenant une structure de client
+ * 	Maxime LAHAYE, Mathieu HARHARIDIS
+ * 	avril 2013
+ ********************************************************/
+
 #ifndef Unix_header_h
 #define Unix_header_h
 #include <sys/types.h>
