@@ -1,9 +1,11 @@
-/*
- * joueurs.c
- *
- *  Created on: Apr 25, 2013
- *      Author: afro
- */
+/********************************************************
+ *  joueur.c
+ *	dossier streams
+ * 	methode de création d'un joueur
+ * 	Maxime LAHAYE, Mathieu HARHARIDIS
+ * 	avril 2013
+ ********************************************************/
+
 #include "joueur.h"
 #include "util.h"
 

@@ -1,9 +1,10 @@
-/*
- * partie.h
- *
- *  Created on: Apr 25, 2013
- *      Author: afro
- */
+/********************************************************
+ *  partie.h
+ *	dossier streams
+ * 	Contient une structure partie ainsi que la défnition des fonctions de partie.c
+ * 	Maxime LAHAYE, Mathieu HARHARIDIS
+ * 	avril 2013
+ ********************************************************/
 
 #ifndef PARTIE_H_
 #define PARTIE_H_

@@ -1,3 +1,11 @@
+/********************************************************
+ *  client.c
+ *	dossier streams
+ * 	programme principal du client
+ * 	Maxime LAHAYE, Mathieu HARHARIDIS
+ * 	avril 2013
+ ********************************************************/
+
 #include "header.h"
 #include "memoire.h"
 #include "util.h"
@@ -17,7 +25,7 @@ SOCKET sock;
 void int_handler(int null);
 int fd_error;
 message mTuile;
-//int position=1;
+int position=1;
 
 int main(int argc, char *argv[]) {
 	int erreur = 0;
@@ -102,14 +110,18 @@ int main(int argc, char *argv[]) {
 			// Message de debut de partie
 			if ((recv(sock, &debut, sizeof(message), 0)) == 0) {
 				closeSocket();
-				afficher_erreur(fd_error, "client-recv\n");
+				afficher_erreur(fd_error, "Le serveur a été coupé\n");
 			}
 			printf("%s\n", debut.data);
 			for (i = 0; i < 20; i++) {
+				printf("Tour numero %d\n", i + 1);
 				// On recoit la tuile tiré par le serveur
 				if ((recv(sock, &mTuile, sizeof(mTuile), 0)) == 0) {
 					closeSocket();
-					afficher_erreur(fd_error, "client-recv\n");
+					afficher_erreur(fd_error, "Le serveur a été coupé\n");
+				}
+				if (mTuile.type != TUILE) {
+					break;
 				}
 				positionnerTuile(0);
 				strcpy(mConf.data, "Confirmation du client! \n");
@@ -119,14 +131,26 @@ int main(int argc, char *argv[]) {
 					afficher_erreur(fd_error, "client-send");
 				}
 			}
-
-			// Message pour signaler la fin de partie
-			if ((recv(sock, recu, sizeof(recu), 0)) == 0) {
-				closeSocket();
-				afficher_erreur(fd_error, "client-recv\n");
+			if(mTuile.type != FINPARTIE){
+				// Message pour signaler la fin de partie
+				if ((recv(sock, recu, sizeof(recu), 0)) == 0) {
+					closeSocket();
+					afficher_erreur(fd_error, "Le serveur a été coupé\n");
+				}
+			}else{
+				printf("%s\n",mTuile.data);
 			}
 			calculDuScore();
-			send(sock, &score, sizeof(int), 0);
+			message scoreM;
+			char scoreC[100];
+			sprintf(scoreC,"%d",score);
+			strcpy(scoreM.data,scoreC);
+			scoreM.type = SCORE;
+			if ((send(sock, &scoreM, sizeof(message), 0)) < 0) {
+				closeSocket();
+				afficher_erreur(fd_error, "client-send-score");
+			}
+
 			// Message pour faire lire le client dans la memoire partagee
 			// pour afficher les scores
 			while (1) {
@@ -137,17 +161,26 @@ int main(int argc, char *argv[]) {
 				}
 			}
 			int k;
-			/*
-			 printf("Tableau de tuiles \n");
-			 for(k=0;k<20;k++){
-			 printf("P:%d T:%d \n",k+1,tabPosition[k]);
-			 }
-			 */
 			printf("FIN\n");
 			printf("TABLEAU DES SCORES\n");
+			int gagnant;
+			int maxScore=0;
+			int monScore=0;
 			for (k = 0; k < part->nombreJoueur; k++) {
+				if(part->joueurs[k].score >= maxScore){
+					maxScore = part->joueurs[k].score;
+					if(strcmp(part->joueurs[k].pseudo, c.pseudo)==0){
+						gagnant=1;
+						monScore=part->joueurs[k].score;
+					}else if(maxScore!=monScore){
+						gagnant=0;
+					}
+				}
 				printf("Pseudo :%s\t Score :%d\n", part->joueurs[k].pseudo,
 						part->joueurs[k].score);
+			}
+			if(gagnant==1){
+				printf("Vous avez gagné ! \n");
 			}
 		} else
 			printf("Impossible de se connecter\n");
@@ -171,7 +204,7 @@ void calculDuScore() {
 		if (valCourante == 31) {
 			valCourante = valPrec;
 		}
-		if (valCourante >= valPrec) {
+		if (valCourante >= valPrec && valCourante!=-1) {
 			serie++;
 		} else {
 			score += tabScore[serie - 1];
@@ -187,22 +220,44 @@ void positionnerTuile(int err) {
 	if (err == 1) {
 		printf(
 				"La case est déjà prise, veuillez entrer une autre position ! :) \n");
-	} else if(err==2){
+	} else if (err == 2) {
 		printf("Veuillez entrer un chiffre entre 1 et 20 ! :) \n");
 	} else {
 		printf(
 				"La tuile est :%s\n Veuillez entrer la position à laquelle vous voulez insérer la tuile\n",
 				mTuile.data);
+		printf("Entrez 0 si vous voulez afficher votre table de tuiles \n");
 	}
+/*
 	if (fgets(ligne, tailleLigne, stdin) == NULL ) {
+		closeSocket();
 		afficher_erreur(fd_error, "serveur-fgets-position\n");
 		exit(1);
 	}
+
 	int position;
-	// penser à peut-être utiliser strtol a la place
+	//penser à peut-être utiliser strtol a la place
 	position = atoi(ligne);
-	if(position<1 || position>20){
-		positionnerTuile(2);
+*/
+	if (position < 1 || position > 20) {
+		if (position == 0) {
+			int k;
+			printf("Tableau de tuiles \n");
+			for (k = 0; k < 20; k++) {
+				char tuile[50];
+				if (tabPosition[k] == -1) {
+					strcpy(tuile, "Vide");
+					printf("%d:%s ", k + 1, tuile);
+				} else {
+					printf("%d:%d ", k + 1, tabPosition[k]);
+				}
+			}
+			printf("\n");
+			positionnerTuile(0);
+
+		} else {
+			positionnerTuile(2);
+		}
 	}
 	int numTuile;
 	numTuile = atoi(mTuile.data);
